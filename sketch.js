@@ -1,5 +1,5 @@
-let cols = 25;
-let rows = 25;
+let cols = 50;
+let rows = 50;
 let grid = new Array(cols);
 
 // width and height of each cell
@@ -37,7 +37,7 @@ function Spot(i, j) {
     /**
      * Wall is by default false. So making it true for some spots randomly
      */
-    if (random(1) < 0.1) {
+    if (random(1) < 0.4) {
         this.wall = true;
     }
 
@@ -76,18 +76,19 @@ function Spot(i, j) {
         if (j > 0) {
             this.neighbours.push(grid[i][j - 1]);
         }
-        // if (i > 0 && j > 0) {
-        //     this.neighbours.push(grid[i - 1][j - 1]);
-        // }
-        // if (i < cols - 1 && j > 0) {
-        //     this.neighbours.push(grid[i + 1][j - 1]);
-        // }
-        // if (i > 0 && j < rows - 1) {
-        //     this.neighbours.push(grid[i - 1][j + 1]);
-        // }
-        // if (i < cols - 1 && j < rows - 1) {
-        //     this.neighbours.push(grid[i + 1][j + 1]);
-        // }
+        // diagonals
+        if (i > 0 && j > 0) {
+            this.neighbours.push(grid[i - 1][j - 1]);
+        }
+        if (i < cols - 1 && j > 0) {
+            this.neighbours.push(grid[i + 1][j - 1]);
+        }
+        if (i > 0 && j < rows - 1) {
+            this.neighbours.push(grid[i - 1][j + 1]);
+        }
+        if (i < cols - 1 && j < rows - 1) {
+            this.neighbours.push(grid[i + 1][j + 1]);
+        }
     }
 }
 
@@ -213,29 +214,37 @@ function draw() {
                 // assumed that g between current to neighbours(in horizontal and vertical) is 1.
                 let tempG = current.g+1;
 
+                let newPath = false;
                 // if neighbour in openSet, neighbour should always having a g value
                 if (openSet.includes(neighbour)) {
                     // if calculated g is less than G in neighbour already change to it to new G
                     if (tempG < neighbour.g) {
                         neighbour.g = tempG;
+                        newPath = true;
                     }
                 } else {
                     neighbour.g = tempG;
-                    console.log('adding ', neighbour);
+                    newPath = true;
                     openSet.push(neighbour);
-                    console.log(openSet);
                 }
 
-                // set neighbour's heuristic - educated guess
-                neighbour.h = heuristic(neighbour, end);
-                neighbour.f = neighbour.g + neighbour.h;
-                // set parent
-                neighbour.previous = current;
+                // below tasks only require if a new path
+                if (newPath) {
+                    // set neighbour's heuristic - educated guess
+                    neighbour.h = heuristic(neighbour, end);
+                    neighbour.f = neighbour.g + neighbour.h;
+                    // set parent
+                    neighbour.previous = current;
+                }
             }
         }
 
     } else {
+        // Stop loop
+        noLoop();
         // no solution
+        console.log('no solution');
+        return;
     }
 
     for(let i=0; i < cols; i++) {

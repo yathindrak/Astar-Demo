@@ -155,6 +155,11 @@ function setup() {
     start = grid[0][0];
     end = grid[cols-1][rows-1];
 
+    // start and end never can be a wall
+    // so making those to false, otherwise algorithm will misbehave.
+    start.wall = false;
+    end.wall = false;
+
     // add the first element to openset
     openSet.push(start);
 }
@@ -202,8 +207,9 @@ function draw() {
 
             /**
              * neighbour should not be in closedList, since it should not be already visited.
+             * Also neighbour shouldn't be a wall
              */
-            if (!closedSet.includes(neighbour)) {
+            if (!closedSet.includes(neighbour) && !neighbour.wall) {
                 // assumed that g between current to neighbours(in horizontal and vertical) is 1.
                 let tempG = current.g+1;
 

@@ -32,9 +32,23 @@ function Spot(i, j) {
     this.h = 0;
     this.neighbours = [];
     this.previous = undefined;
+    this.wall = false;
+
+    /**
+     * Wall is by default false. So making it true for some spots randomly
+     */
+    if (random(1) < 0.1) {
+        this.wall = true;
+    }
 
     this.show = function (color) {
         fill(color);
+
+        // fill black if spot is a wall
+        if (this.wall) {
+            fill(0);
+        }
+
         noStroke();
         // stroke(255, 0, 200);
         // strokeWeight(w / 2);

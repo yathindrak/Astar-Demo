@@ -37,22 +37,21 @@ function Spot(i, j) {
     /**
      * Wall is by default false. So making it true for some spots randomly
      */
-    if (random(1) < 0.4) {
+    if (random(1) < 0.3) {
         this.wall = true;
     }
 
     this.show = function (color) {
-        fill(color);
+        // fill(color);
 
         // fill black if spot is a wall
         if (this.wall) {
             fill(0);
+            noStroke();
+            // stroke(255, 0, 200);
+            // strokeWeight(w / 2);
+            ellipse(this.i * w + w/2, this.j * h + h/2, w/2, h/2);
         }
-
-        noStroke();
-        // stroke(255, 0, 200);
-        // strokeWeight(w / 2);
-        rect(this.i * w, this.j * h, w-1, h-1);
     };
 
     /**
@@ -169,7 +168,7 @@ function draw() {
 
     let winner, current;
 
-    background(0);
+
     /**
      * as long as openSet has items to be evaluated, evaluate them
      * SPECIAL: The reason it has added below open checker inside draw
@@ -191,7 +190,6 @@ function draw() {
         if (current === end) {
             // stop the loop
             noLoop();
-
             console.log('DONE!!!');
         }
 
@@ -212,7 +210,7 @@ function draw() {
              */
             if (!closedSet.includes(neighbour) && !neighbour.wall) {
                 // assumed that g between current to neighbours(in horizontal and vertical) is 1.
-                let tempG = current.g+1;
+                let tempG = current.g + heuristic(neighbour, current);
 
                 let newPath = false;
                 // if neighbour in openSet, neighbour should always having a g value
@@ -247,6 +245,8 @@ function draw() {
         return;
     }
 
+    background(255);
+
     for(let i=0; i < cols; i++) {
         for(let j=0; j < rows; j++) {
             grid[i][j].show(color(255));
@@ -255,12 +255,12 @@ function draw() {
 
     // make closedSet items red
     for(let i=0; i < closedSet.length; i++) {
-        closedSet[i].show(color(255, 0, 0));
+        // closedSet[i].show(color(255, 0, 0));
     }
 
     // make openSet items green
     for(let i=0; i < openSet.length; i++) {
-        openSet[i].show(color(0, 255, 0));
+        // openSet[i].show(color(0, 255, 0));
     }
 
     path =[];
@@ -276,6 +276,17 @@ function draw() {
 
     // path mark in blue
     for(let i=0; i < path.length; i++) {
-        path[i].show(color(0, 0, 255));
+        // path[i].show(color(0, 0, 255));
     }
+
+    // draw vertex
+    noFill();
+    stroke(255, 0, 200);
+    strokeWeight(w / 2);
+    beginShape();
+    for (var i = 0; i < path.length; i++) {
+        vertex(path[i].i * w + w / 2, path[i].j * h + h / 2);
+    }
+    endShape();
+
 }

@@ -18,20 +18,56 @@ let start;
 let end;
 
 function Spot(i, j) {
-    // x,y coordinates of each spot, for displaying purposes
-    this.x = i;
-    this.y = j;
+    // x,y coordinates of each spot, for displaying purposes named as i,j
+    this.i = i;
+    this.j = j;
     // properties of a spot
     this.f = 0;
     this.g = 0;
     this.h = 0;
+    this.neighbours = [];
 
     this.show = function (color) {
         fill(color);
         noStroke();
         // stroke(255, 0, 200);
         // strokeWeight(w / 2);
-        rect(this.x * w, this.y * h, w-1, h-1);
+        rect(this.i * w, this.j * h, w-1, h-1);
+    };
+
+    /**
+     * Add neighbours
+     * @param grid - this grid param useful when add neighbours
+     */
+    this.addNeighbours = function (grid) {
+        const i = this.i;
+        const j = this.j;
+        // conditions to support add neighbours add neighbour nodes,
+        // and avoid accessing unexisting nodes
+        if (i < cols - 1) {
+            this.neighbours.push(grid[i + 1][j]);
+        }
+        if (i > 0) {
+            this.neighbours.push(grid[i - 1][j]);
+        }
+        // if (j < rows - 1) {
+        //     this.neighbours.push(grid[i][j + 1]);
+        // }
+        // if (j > 0) {
+        //     this.neighbours.push(grid[i][j - 1]);
+        // }
+        // if (i > 0 && j > 0) {
+        //     this.neighbours.push(grid[i - 1][j - 1]);
+        // }
+        // if (i < cols - 1 && j > 0) {
+        //     this.neighbours.push(grid[i + 1][j - 1]);
+        // }
+        // if (i > 0 && j < rows - 1) {
+        //     this.neighbours.push(grid[i - 1][j + 1]);
+        // }
+        // if (i < cols - 1 && j < rows - 1) {
+        //     this.neighbours.push(grid[i + 1][j + 1]);
+        // }
     }
 }
 
@@ -65,6 +101,13 @@ function setup() {
     for(let i=0; i < cols; i++) {
         for(let j=0; j < rows; j++) {
             grid[i][j] = new Spot(i,j);
+        }
+    }
+
+    // add neighbours
+    for(let i=0; i < cols; i++) {
+        for(let j=0; j < rows; j++) {
+            grid[i][j].addNeighbours(grid);
         }
     }
     
@@ -104,6 +147,32 @@ function draw() {
        // add the `current` to the closedSet and remove from openSet
        removeFromArray(openSet, current);
        closedSet.push(current);
+
+       // get neighbours of current
+       let neighbours = current.neighbours;
+
+       for (let i = 0; i < neighbours.length; i++) {
+           let neighbour = neighbours[i];
+
+           /**
+            * neighbour should not be in closedList, since it should not be already visited.
+            */
+           if (!closedSet.includes(neighbour)) {
+               // assumed that g between current to neighbours(in horizontal and vertical) is 1.
+               let tempG = current.g+1;
+
+               // if neighbour in openSet, neighbour should always having a g value
+               if (openSet.includes(neighbour)) {
+                   // if calculated g is less than G in neighbour already change to it to new G
+                   if (tempG < neighbour.g) {
+                       neighbour.g = tempG;
+                   }
+               } else {
+                   neighbour.g = tempG;
+                   openSet.push(neighbour);
+               }
+           }
+       }
 
    } else {
        // no solution
